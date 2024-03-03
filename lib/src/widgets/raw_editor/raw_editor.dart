@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart'
     show
         AnimationController,
@@ -84,4 +85,14 @@ abstract class EditorState extends State<QuillRawEditor>
   bool showToolbar();
 
   void requestKeyboard();
+
+  @override
+  void initState() {
+    super.initState();
+    widget.configurations.controller.addListener(() {
+      widget.configurations.onChanged?.call(
+        widget.configurations.controller.document,
+      );
+    });
+  }
 }

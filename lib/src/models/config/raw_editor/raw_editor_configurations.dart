@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart' show Brightness, Uint8List;
+import 'package:flutter/foundation.dart'
+    show Brightness, Uint8List, VoidCallback;
 import 'package:flutter/material.dart'
     show
         AdaptiveTextSelectionToolbar,
@@ -23,6 +24,7 @@ import 'package:flutter/widgets.dart'
         TextSelectionControls,
         ValueChanged,
         Widget;
+import 'package:flutter_quill/src/models/documents/document.dart';
 import 'package:meta/meta.dart' show immutable;
 
 import '../../../widgets/others/cursor.dart';
@@ -81,7 +83,12 @@ class QuillRawEditorConfigurations extends Equatable {
     this.enableScribble = false,
     this.onScribbleActivated,
     this.scribbleAreaInsets,
+    this.onDone,
+    this.onChanged,
   });
+
+  final VoidCallback? onDone;
+  final Function(Document document)? onChanged;
 
   /// Controls the document being edited.
   final QuillController controller;

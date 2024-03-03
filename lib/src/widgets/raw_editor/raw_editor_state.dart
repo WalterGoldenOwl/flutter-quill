@@ -1158,6 +1158,7 @@ class QuillRawEditorState extends EditorState
   @override
   void initState() {
     super.initState();
+
     if (_clipboardStatus != null) {
       _clipboardStatus!.addListener(_onChangedClipboardStatus);
     }
@@ -1202,6 +1203,9 @@ class QuillRawEditorState extends EditorState
         }
       });
     }
+
+    SchedulerBinding.instance
+        .addPostFrameCallback((_) => openConnectionIfNeeded());
 
     // Focus
     widget.configurations.focusNode.addListener(_handleFocusChanged);
@@ -1433,7 +1437,6 @@ class QuillRawEditorState extends EditorState
           .addPostFrameCallback((_) => _handleFocusChanged());
       return;
     }
-    openOrCloseConnection();
     _cursorCont.startOrStopCursorTimerIfNeeded(_hasFocus, controller.selection);
     _updateOrDisposeSelectionOverlayIfNeeded();
     if (_hasFocus) {
@@ -1793,4 +1796,9 @@ class QuillRawEditorState extends EditorState
 
   @override
   bool get shareEnabled => false;
+
+  @override
+  void performPrivateCommand(String action, Map<String, dynamic> data) {
+    //TODO no body
+  }
 }

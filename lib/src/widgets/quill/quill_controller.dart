@@ -38,6 +38,14 @@ class QuillController extends ChangeNotifier {
     );
   }
 
+  QuillController copyWith() {
+    return QuillController(
+      document: Document.fromDelta(document.toDelta()),
+      selection: selection.copyWith(),
+      keepStyleOnNewLine: keepStyleOnNewLine,
+    );
+  }
+
   /// Document managed by this controller.
   Document _document;
 

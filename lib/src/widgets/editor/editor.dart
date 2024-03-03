@@ -142,6 +142,7 @@ class QuillEditor extends StatefulWidget {
         keyboardAppearance: configurations.keyboardAppearance,
         embedBuilders: configurations.embedBuilders,
         editorKey: configurations.editorKey,
+        onDone: configurations.onDone,
       ),
     );
   }
@@ -228,6 +229,8 @@ class QuillEditorState extends State<QuillEditor>
           child: QuillRawEditor(
             key: _editorKey,
             configurations: QuillRawEditorConfigurations(
+              onDone: configurations.onDone,
+              onChanged: configurations.onChanged,
               controller: configurations.controller,
               focusNode: widget.focusNode,
               scrollController: widget.scrollController,
@@ -288,6 +291,9 @@ class QuillEditorState extends State<QuillEditor>
               enableScribble: configurations.enableScribble,
               onScribbleActivated: configurations.onScribbleActivated,
               scribbleAreaInsets: configurations.scribbleAreaInsets,
+              textInputAction: configurations.textInputAction,
+              requestKeyboardFocusOnCheckListChanged:
+                  configurations.requestKeyboardFocusOnCheckListChanged,
             ),
           ),
         ),

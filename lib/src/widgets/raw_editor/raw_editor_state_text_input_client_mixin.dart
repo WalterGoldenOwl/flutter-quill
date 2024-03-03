@@ -39,48 +39,33 @@ mixin RawEditorStateTextInputClientMixin on EditorState
 
   /// Opens or closes input connection based on the current state of
   /// [focusNode] and [value].
-  void openOrCloseConnection() {
-    if (widget.configurations.focusNode.hasFocus &&
-        widget.configurations.focusNode.consumeKeyboardToken()) {
-      openConnectionIfNeeded();
-    } else if (!widget.configurations.focusNode.hasFocus) {
-      closeConnectionIfNeeded();
-    }
-  }
 
   void openConnectionIfNeeded() {
-    if (!shouldCreateInputConnection) {
-      return;
-    }
+    _lastKnownRemoteTextEditingValue = textEditingValue;
+    _textInputConnection = TextInput.attach(
+      this,
+      TextInputConfiguration(
+        readOnly: widget.configurations.readOnly,
+        inputAction: widget.configurations.textInputAction,
+        enableSuggestions: !widget.configurations.readOnly,
+        keyboardAppearance: widget.configurations.keyboardAppearance ??
+            CupertinoTheme.maybeBrightnessOf(context) ??
+            Theme.of(context).brightness,
+        textCapitalization: widget.configurations.textCapitalization,
+        allowedMimeTypes:
+            widget.configurations.contentInsertionConfiguration == null
+                ? const <String>[]
+                : widget.configurations.contentInsertionConfiguration!
+                    .allowedMimeTypes,
+      ),
+    );
 
-    if (!hasConnection) {
-      _lastKnownRemoteTextEditingValue = textEditingValue;
-      _textInputConnection = TextInput.attach(
-        this,
-        TextInputConfiguration(
-          inputType: TextInputType.multiline,
-          readOnly: widget.configurations.readOnly,
-          inputAction: widget.configurations.textInputAction,
-          enableSuggestions: !widget.configurations.readOnly,
-          keyboardAppearance: widget.configurations.keyboardAppearance ??
-              CupertinoTheme.maybeBrightnessOf(context) ??
-              Theme.of(context).brightness,
-          textCapitalization: widget.configurations.textCapitalization,
-          allowedMimeTypes:
-              widget.configurations.contentInsertionConfiguration == null
-                  ? const <String>[]
-                  : widget.configurations.contentInsertionConfiguration!
-                      .allowedMimeTypes,
-        ),
-      );
-
-      _updateSizeAndTransform();
-      //update IME position for Windows
-      _updateComposingRectIfNeeded();
-      //update IME position for Macos
-      _updateCaretRectIfNeeded();
-      _textInputConnection!.setEditingState(_lastKnownRemoteTextEditingValue!);
-    }
+    _updateSizeAndTransform();
+    //update IME position for Windows
+    _updateComposingRectIfNeeded();
+    //update IME position for Macos
+    _updateCaretRectIfNeeded();
+    _textInputConnection!.setEditingState(_lastKnownRemoteTextEditingValue!);
     _textInputConnection!.show();
   }
 
@@ -95,6 +80,23 @@ mixin RawEditorStateTextInputClientMixin on EditorState
       _textInputConnection!.setComposingRect(composingRect);
       SchedulerBinding.instance
           .addPostFrameCallback((_) => _updateComposingRectIfNeeded());
+    }
+  }
+
+  @override
+  void performAction(TextInputAction action) {
+    switch (action) {
+      case TextInputAction.done:
+      case TextInputAction.go:
+      case TextInputAction.next:
+      case TextInputAction.previous:
+      case TextInputAction.search:
+      case TextInputAction.send:
+        widget.configurations.focusNode.unfocus();
+        if (widget.configurations.onDone != null) {
+          widget.configurations.onDone!();
+        }
+      default:
     }
   }
 
@@ -207,16 +209,6 @@ mixin RawEditorStateTextInputClientMixin on EditorState
             affinity: widget.configurations.controller.selection.affinity),
       );
     }
-  }
-
-  @override
-  void performAction(TextInputAction action) {
-    // no-op
-  }
-
-  @override
-  void performPrivateCommand(String action, Map<String, dynamic> data) {
-    // no-op
   }
 
   // The time it takes for the floating cursor to snap to the text aligned

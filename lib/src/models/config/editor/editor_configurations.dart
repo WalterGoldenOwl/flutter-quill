@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart' show Brightness, Uint8List, immutable;
 import 'package:flutter/material.dart'
     show TextCapitalization, TextInputAction, TextSelectionThemeData;
 import 'package:flutter/widgets.dart';
+import 'package:flutter_quill/src/models/documents/document.dart';
 import 'package:meta/meta.dart' show experimental;
 
 import '../../../widgets/editor/editor_builder.dart';
@@ -79,9 +80,14 @@ class QuillEditorConfigurations extends Equatable {
     this.enableScribble = false,
     this.onScribbleActivated,
     this.scribbleAreaInsets,
+    this.onDone,
+    this.onChanged,
   });
 
   final QuillSharedConfigurations sharedConfigurations;
+
+  final VoidCallback? onDone;
+  final Function(Document document)? onChanged;
 
   final QuillController controller;
 
@@ -408,8 +414,12 @@ class QuillEditorConfigurations extends Equatable {
     bool? enableScribble,
     void Function()? onScribbleActivated,
     EdgeInsets? scribbleAreaInsets,
+    VoidCallback? onDone,
+    Function(Document value)? onChange,
   }) {
     return QuillEditorConfigurations(
+      onDone: onDone,
+      onChanged: onChanged,
       sharedConfigurations: sharedConfigurations ?? this.sharedConfigurations,
       controller: controller ?? this.controller,
       placeholder: placeholder ?? this.placeholder,
